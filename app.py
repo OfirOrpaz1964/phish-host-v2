@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from datetime import datetime
 
 app = Flask(__name__)
@@ -8,11 +8,14 @@ def log_data():
     ip = request.remote_addr
     data = request.get_data(as_text=True)
     now = datetime.utcnow().isoformat()
+    log_line = f"[{now}] {ip} → {data}"
 
-    with open("log.txt", "a") as f:
-        f.write(f"[{now}] {ip} → {data}\n")
+    print(log_line, flush=True)
 
-    return "Logged", 200
+    # Explicit clean HTTP response
+    response = make_response("Logged", 200)
+    response.mimetype = "text/plain"
+    return response
 
 @app.route('/')
 def index():
